@@ -53,22 +53,14 @@ const createEnquiry = asyncHandler(async (req, res) => {
         boatName: boatTitle
     };
 
-    // Send Email to Owner
-    try {
-        await sendOwnerNotification(enquiryData);
-        console.log('✅ Owner email notification sent successfully');
-    } catch (error) {
-        console.error('❌ Failed to send owner email:', error.message);
-        // Continue execution - don't fail the enquiry
-    }
+    // Send Email to Owner (Non-blocking)
+    sendOwnerNotification(enquiryData)
+        .then(() => console.log('✅ Owner email notification sent successfully'))
+        .catch(error => console.error('❌ Failed to send owner email:', error.message));
 
-    // Send WhatsApp notification to Owner
-    try {
-        await sendWhatsApp(enquiryData);
-        console.log('✅ Owner WhatsApp notification logged');
-    } catch (error) {
-        console.error('❌ Failed to send WhatsApp notification:', error.message);
-    }
+    // Send WhatsApp notification (Non-blocking)
+    sendWhatsApp(enquiryData)
+        .catch(error => console.error('❌ Failed to send WhatsApp notification:', error.message));
 
     res.status(201).json(createdEnquiry);
 });
