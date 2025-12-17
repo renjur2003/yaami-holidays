@@ -13,18 +13,14 @@ const sendEmail = async (options) => {
     console.log(`📧 [DEBUG] Credentials found for user: ${process.env.EMAIL_USER}`);
 
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // Use STARTTLS
-        family: 4, // Force IPv4
-        tls: {
-            rejectUnauthorized: false // Bypass SSL verification issues causing hangs
-        },
-        connectionTimeout: 10000,
+        service: 'gmail', // Use built-in Gmail preset (handles ports/hosts automatically)
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove spaces if present
         },
+        tls: {
+            rejectUnauthorized: false // Bypass SSL strictness
+        }
     });
 
     const mailOptions = {
