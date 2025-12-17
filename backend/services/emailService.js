@@ -13,11 +13,13 @@ const sendEmail = async (options) => {
     console.log(`📧 [DEBUG] Credentials found for user: ${process.env.EMAIL_USER}`);
 
     const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        host: 'smtp.googlemail.com', // Try alternate alias
+        port: 465,
+        secure: true, // Use SSL
         family: 4, // Force IPv4
-        connectionTimeout: 10000, // Fail after 10 seconds if stuck
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
