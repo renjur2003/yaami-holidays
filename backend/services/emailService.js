@@ -1,17 +1,22 @@
 import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
+    console.log('📧 [DEBUG] Starting sendEmail...');
+    
     // If no email config, skip
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log('Skipping email sending: Credentials not found');
+        console.log('❌ [DEBUG] Skipping email sending: Credentials not found in process.env');
+        console.log('EMAIL_USER present:', !!process.env.EMAIL_USER);
+        console.log('EMAIL_PASS present:', !!process.env.EMAIL_PASS);
         return;
     }
+    console.log(`📧 [DEBUG] Credentials found for user: ${process.env.EMAIL_USER}`);
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
         secure: true,
-        family: 4, // Force IPv4 to prevent timeouts on Render/Docker
+        family: 4, // Force IPv4
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
@@ -26,7 +31,17 @@ const sendEmail = async (options) => {
         html: options.html || options.message.replace(/\n/g, '<br>'),
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+        console.log(`📧 [DEBUG] Attempting to send mail to: ${options.email} via port 465...`);
+        const info = await transporter.sendMail(mailOptions);
+        console.log('✅ [DEBUG] Email sent successfully!');
+        console.log('📧 [DEBUG] Message ID:', info.messageId);
+        console.log('📧 [DEBUG] Response:', info.response);
+    } catch (error) {
+        console.error('❌ [DEBUG] Error in transporter.sendMail:');
+        console.error(error);
+        throw error; // Re-throw to be caught by controller
+    }
 };
 
 // Send owner notification with enquiry details
