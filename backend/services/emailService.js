@@ -32,14 +32,20 @@ const sendEmail = async (options) => {
     };
 
     try {
-        console.log(`📧 [DEBUG] Attempting to send mail to: ${options.email} via port 465...`);
+        console.log(`📧 [DEBUG] Verifying transporter connection to: ${options.email}...`);
+        await transporter.verify();
+        console.log('✅ [DEBUG] Transporter verified successfully!');
+        
+        console.log(`📧 [DEBUG] Attempting to send mail via port 465 (SSL)...`);
         const info = await transporter.sendMail(mailOptions);
         console.log('✅ [DEBUG] Email sent successfully!');
         console.log('📧 [DEBUG] Message ID:', info.messageId);
         console.log('📧 [DEBUG] Response:', info.response);
     } catch (error) {
-        console.error('❌ [DEBUG] Error in transporter.sendMail:');
-        console.error(error);
+        console.error('❌ [DEBUG] Error in email sending process:');
+        console.error('Error Code:', error.code);
+        console.error('Error Command:', error.command);
+        console.error('Error Message:', error.message);
         throw error; // Re-throw to be caught by controller
     }
 };

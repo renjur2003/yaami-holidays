@@ -20,13 +20,19 @@ const createEnquiry = asyncHandler(async (req, res) => {
         boatName
     } = req.body;
 
+    console.time('boatLookup');
     let boatTitle = boatName || boatType || 'General Enquiry';
     if (boatId) {
-        const boat = await Boat.findById(boatId);
-        if (boat) {
-            boatTitle = boat.title;
+        try {
+            const boat = await Boat.findById(boatId);
+            if (boat) {
+                boatTitle = boat.title;
+            }
+        } catch (err) {
+            console.error('❌ [PERF] Boat lookup error:', err.message);
         }
     }
+    console.timeEnd('boatLookup');
 
     const enquiry = new Enquiry({
         boat: boatId || undefined,
@@ -40,7 +46,9 @@ const createEnquiry = asyncHandler(async (req, res) => {
         status: 'pending'
     });
 
+    console.time('enquirySave');
     const createdEnquiry = await enquiry.save();
+    console.timeEnd('enquirySave');
 
     // Send notifications to OWNER (not customer)
     const enquiryData = {
