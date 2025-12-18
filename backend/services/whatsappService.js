@@ -25,7 +25,7 @@ ${message ? `*Message:* ${message}` : ''}
 _This is an automated notification from Yaami Holidays._`;
 
     // Create wa.me link (for reference/logging)
-    const waLink = `https://wa.me/${ownerPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+    const waLink = `https://wa.me/+91${ownerPhone}?text=${encodeURIComponent(whatsappMessage)}`;
     
     console.log('\n========================================');
     console.log('📱 WHATSAPP NOTIFICATION TO OWNER');

@@ -97,7 +97,7 @@ export const sendOwnerNotification = async (enquiryData) => {
                 <div style="margin-top: 30px; padding: 15px; background-color: #f0f0f0; border-left: 4px solid #d4af37; border-radius: 4px;">
                     <p style="margin: 0; color: #555;">
                         <strong>Quick Actions:</strong><br>
-                        <a href="https://wa.me/${phone}" style="color: #25D366; text-decoration: none; margin-right: 15px;">📱 WhatsApp</a>
+                        <a href="https://wa.me/+91${phone}" style="color: #25D366; text-decoration: none; margin-right: 15px;">📱 WhatsApp</a>
                         <a href="tel:${phone}" style="color: #d4af37; text-decoration: none; margin-right: 15px;">📞 Call</a>
                         <a href="mailto:${email}" style="color: #d4af37; text-decoration: none;">✉️ Email</a>
                     </p>

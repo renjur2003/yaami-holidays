@@ -1,12 +1,33 @@
-import BookingList from '../../components/admin/BookingList';
-import AddBoat from '../../components/admin/AddBoat';
-import { LayoutDashboard, Ship, Calendar, Settings, LogOut } from 'lucide-react';
-import SEO from '../../components/SEO';
+import React, { useState, useEffect } from 'react';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('bookings');
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = () => {
+            const key = localStorage.getItem('adminSecretKey');
+            if (key) {
+                setIsAuthorized(true);
+            } else {
+                const promptKey = window.prompt("Enter Admin Secret Key to access dashboard:");
+                if (promptKey) {
+                    localStorage.setItem('adminSecretKey', promptKey);
+                    setIsAuthorized(true);
+                }
+            }
+        };
+        checkAuth();
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('adminSecretKey');
+        window.location.reload();
+    };
 
     const renderContent = () => {
+        if (!isAuthorized) return <div className="text-white p-8">Loading authorization...</div>;
+        
         switch(activeTab) {
             case 'bookings': return <BookingList />;
             case 'add-boat': return <AddBoat />;
@@ -29,7 +50,10 @@ const AdminDashboard = () => {
                     <SidebarItem icon={<Settings size={20} />} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
                 </nav>
                 <div className="absolute bottom-10 px-4 w-full">
-                    <button className="flex items-center gap-3 text-red-400 hover:text-red-300 w-full px-4 py-3 rounded-lg hover:bg-white/5 transition-colors">
+                    <button 
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 text-red-400 hover:text-red-300 w-full px-4 py-3 rounded-lg hover:bg-white/5 transition-colors"
+                    >
                         <LogOut size={20} /> Logout
                     </button>
                 </div>

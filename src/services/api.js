@@ -9,6 +9,15 @@ const api = axios.create({
     },
 });
 
+// Add interceptor for Admin Secret Key
+api.interceptors.request.use((config) => {
+    const adminKey = localStorage.getItem('adminSecretKey');
+    if (adminKey) {
+        config.headers['X-Admin-Key'] = adminKey;
+    }
+    return config;
+});
+
 // Removed interceptor as auth is removed
 
 export const getBoats = async () => {

@@ -1,11 +1,6 @@
-import express from 'express';
-const router = express.Router();
-import {
-    createEnquiry,
-    getEnquiries,
-} from '../controllers/bookingController.js';
+import { simpleAdminProtect } from '../middleware/simpleAuth.js';
 
-// No auth protection
-router.route('/').post(createEnquiry).get(getEnquiries);
+// Enquiries: POST is public, GET (viewing) is protected
+router.route('/').post(createEnquiry).get(simpleAdminProtect, getEnquiries);
 
 export default router;
