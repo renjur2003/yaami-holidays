@@ -1,56 +1,41 @@
-import nodemailer from 'nodemailer';
+import axios from 'axios';
 
 const sendEmail = async (options) => {
-    console.log('📧 [DEBUG] Starting sendEmail...');
+    console.log('📧 [DEBUG] Starting sendEmail via Resend API...');
     
-    // If no email config, skip
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log('❌ [DEBUG] Skipping email sending: Credentials not found in process.env');
-        console.log('EMAIL_USER present:', !!process.env.EMAIL_USER);
-        console.log('EMAIL_PASS present:', !!process.env.EMAIL_PASS);
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    
+    if (!RESEND_API_KEY) {
+        console.log('❌ [DEBUG] Skipping: RESEND_API_KEY not found in environment variables');
         return;
     }
-    console.log(`📧 [DEBUG] Credentials found for user: ${process.env.EMAIL_USER}`);
-
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        family: 4, // Force IPv4 to avoid common cloud IPv6 routing issues
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove spaces if present
-        },
-        tls: {
-            rejectUnauthorized: false // Bypass SSL strictness
-        },
-        connectionTimeout: 10000, // 10 seconds timeout
-    });
-
-    const mailOptions = {
-        from: `Yaami Holidays <${process.env.EMAIL_USER}>`,
-        to: options.email,
-        subject: options.subject,
-        text: options.message,
-        html: options.html || options.message.replace(/\n/g, '<br>'),
-    };
 
     try {
-        console.log(`📧 [DEBUG] Verifying transporter connection to: ${options.email}...`);
-        await transporter.verify();
-        console.log('✅ [DEBUG] Transporter verified successfully!');
+        console.log(`📧 [DEBUG] Sending via Resend API to: ${options.email}...`);
         
-        console.log(`📧 [DEBUG] Attempting to send mail via port 465 (SSL)...`);
-        const info = await transporter.sendMail(mailOptions);
-        console.log('✅ [DEBUG] Email sent successfully!');
-        console.log('📧 [DEBUG] Message ID:', info.messageId);
-        console.log('📧 [DEBUG] Response:', info.response);
+        const response = await axios.post('https://api.resend.com/emails', {
+            from: 'Yaami Holidays <onboarding@resend.dev>',
+            to: options.email,
+            subject: options.subject,
+            html: options.html || options.message.replace(/\n/g, '<br>'),
+        }, {
+            headers: {
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('✅ [DEBUG] Email sent successfully via Resend!');
+        console.log('📧 [DEBUG] Resend ID:', response.data.id);
     } catch (error) {
-        console.error('❌ [DEBUG] Error in email sending process:');
-        console.error('Error Code:', error.code);
-        console.error('Error Command:', error.command);
-        console.error('Error Message:', error.message);
-        throw error; // Re-throw to be caught by controller
+        console.error('❌ [DEBUG] Error in Resend API process:');
+        if (error.response) {
+            console.error('Data:', error.response.data);
+            console.error('Status:', error.response.status);
+        } else {
+            console.error('Message:', error.message);
+        }
+        throw error;
     }
 };
 
