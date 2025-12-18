@@ -8,6 +8,8 @@ import sendWhatsApp from '../services/whatsappService.js';
 // @route   POST /api/bookings (repurposed for enquiries)
 // @access  Public
 const createEnquiry = asyncHandler(async (req, res) => {
+    console.log('📥 [DEBUG] Received Enquiry Request:', req.body);
+    
     const {
         boatId,
         boatType,
@@ -20,57 +22,73 @@ const createEnquiry = asyncHandler(async (req, res) => {
         boatName
     } = req.body;
 
-    console.time('boatLookup');
-    let boatTitle = boatName || boatType || 'General Enquiry';
-    if (boatId) {
-        try {
-            const boat = await Boat.findById(boatId);
-            if (boat) {
-                boatTitle = boat.title;
-            }
-        } catch (err) {
-            console.error('❌ [PERF] Boat lookup error:', err.message);
+    try {
+        console.time('boatLookup');
+        let boatTitle = boatName || boatType || 'General Enquiry';
+        
+        // Clean boatId: if it's not a valid MongoDB ObjectId (24 hex chars), unset it
+        let validBoatId = null;
+        if (boatId && /^[0-9a-fA-F]{24}$/.test(boatId)) {
+            validBoatId = boatId;
         }
+
+        if (validBoatId) {
+            try {
+                const boat = await Boat.findById(validBoatId);
+                if (boat) {
+                    boatTitle = boat.title;
+                }
+            } catch (err) {
+                console.error('❌ [DEBUG] Boat lookup error:', err.message);
+            }
+        }
+        console.timeEnd('boatLookup');
+
+        const enquiry = new Enquiry({
+            boat: validBoatId || undefined,
+            boatType: boatTitle,
+            customerName: name,
+            customerEmail: email,
+            customerPhone: phone,
+            date: date || new Date(), // Fallback to now if date is missing/invalid
+            guests: guests || 1,
+            message: message || '',
+            status: 'pending'
+        });
+
+        console.time('enquirySave');
+        const createdEnquiry = await enquiry.save();
+        console.timeEnd('enquirySave');
+
+        // Send notifications to OWNER (not customer)
+        const enquiryData = {
+            name,
+            email,
+            phone,
+            date: date || new Date(),
+            guests: guests || 1,
+            message: message || '',
+            boatName: boatTitle
+        };
+
+        // Send Email to Owner (Non-blocking)
+        sendOwnerNotification(enquiryData)
+            .then(() => console.log('✅ [DEBUG] Owner email notification sent successfully'))
+            .catch(error => console.error('❌ [DEBUG] Failed to send owner email:', error.message));
+
+        // Send WhatsApp notification (Non-blocking)
+        sendWhatsApp(enquiryData)
+            .catch(error => console.error('❌ [DEBUG] Failed to send WhatsApp notification:', error.message));
+
+        return res.status(201).json(createdEnquiry);
+    } catch (error) {
+        console.error('❌ [DEBUG] Critical Error in createEnquiry:', error.message);
+        res.status(500).json({ 
+            message: 'Internal Server Error during enquiry creation', 
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
-    console.timeEnd('boatLookup');
-
-    const enquiry = new Enquiry({
-        boat: boatId || undefined,
-        boatType: boatTitle,
-        customerName: name,
-        customerEmail: email,
-        customerPhone: phone,
-        date,
-        guests,
-        message,
-        status: 'pending'
-    });
-
-    console.time('enquirySave');
-    const createdEnquiry = await enquiry.save();
-    console.timeEnd('enquirySave');
-
-    // Send notifications to OWNER (not customer)
-    const enquiryData = {
-        name,
-        email,
-        phone,
-        date,
-        guests,
-        message: message || '',
-        boatName: boatTitle
-    };
-
-    // Send Email to Owner (Non-blocking)
-    sendOwnerNotification(enquiryData)
-        .then(() => console.log('✅ Owner email notification sent successfully'))
-        .catch(error => console.error('❌ Failed to send owner email:', error.message));
-
-    // Send WhatsApp notification (Non-blocking)
-    sendWhatsApp(enquiryData)
-        .catch(error => console.error('❌ Failed to send WhatsApp notification:', error.message));
-
-    res.status(201).json(createdEnquiry);
 });
 
 // @desc    Get all enquiries (Admin)
