@@ -71,13 +71,16 @@ const createEnquiry = asyncHandler(async (req, res) => {
             boatName: boatTitle
         };
 
-        // Send Email to Owner (Non-blocking)
-        sendOwnerNotification(enquiryData)
-            .catch(err => console.error('Email failed:', err.message));
-
-        // Send WhatsApp notification (Non-blocking)
-        sendWhatsApp(enquiryData)
-            .catch(err => console.error('WhatsApp failed:', err.message));
+        // Send notifications (Awaited for Vercel/Serverless execution)
+        try {
+            const emailPromise = sendOwnerNotification(enquiryData);
+            const whatsappPromise = sendWhatsApp(enquiryData);
+            
+            await Promise.all([emailPromise, whatsappPromise]);
+        } catch (err) {
+            console.error('Notification error:', err);
+            // Don't fail the request if notifications fail, just log it
+        }
 
         return res.status(201).json(createdEnquiry);
     } catch (error) {
