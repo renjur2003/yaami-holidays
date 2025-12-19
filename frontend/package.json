@@ -37,6 +37,7 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.6.1",
-    "@esbuild/linux-x64": "0.24.2"
+    "@esbuild/linux-x64": "0.24.2",
+    "lightningcss-linux-x64-gnu": "1.30.2"
   }
 }
