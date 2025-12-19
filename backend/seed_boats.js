@@ -44,19 +44,19 @@ const newBoats = [
 ];
 
 const seedBoats = async () => {
-    console.log('Seeding Kayaking and Motor Boats (Robust Mode)...');
+
     let successCount = 0;
     
     for (const boat of newBoats) {
         try {
             await axios.post('http://localhost:5000/api/boats', boat);
-            console.log(`[SUCCESS] Added: ${boat.title}`);
+
             successCount++;
         } catch (error) {
             console.error(`[FAILED] ${boat.title}:`, error.response ? error.response.data : error.message);
         }
     }
-    console.log(`Seeding complete! ${successCount}/${newBoats.length} added.`);
+
 };
 
 seedBoats();

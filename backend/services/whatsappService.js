@@ -7,7 +7,6 @@ const sendWhatsAppNotification = async (enquiryData) => {
     const ownerPhone = process.env.OWNER_WHATSAPP;
     
     if (!ownerPhone) {
-        console.log('Owner WhatsApp number not configured');
         return;
     }
 
@@ -27,13 +26,8 @@ _This is an automated notification from Yaami Holidays._`;
     // Create wa.me link (for reference/logging)
     const waLink = `https://wa.me/+91${ownerPhone}?text=${encodeURIComponent(whatsappMessage)}`;
     
-    console.log('\n========================================');
-    console.log('📱 WHATSAPP NOTIFICATION TO OWNER');
-    console.log('========================================');
-    console.log(`To: ${ownerPhone}`);
-    console.log(`\nMessage:\n${whatsappMessage}`);
-    console.log(`\nwa.me Link: ${waLink}`);
-    console.log('========================================\n');
+
+
     
     // Note: For actual WhatsApp API integration, you would need:
     // 1. WhatsApp Business API account

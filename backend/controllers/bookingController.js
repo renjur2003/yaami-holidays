@@ -8,7 +8,7 @@ import sendWhatsApp from '../services/whatsappService.js';
 // @route   POST /api/bookings (repurposed for enquiries)
 // @access  Public
 const createEnquiry = asyncHandler(async (req, res) => {
-    console.log('📥 [DEBUG] Received Enquiry Request:', req.body);
+
     
     const {
         boatId,
@@ -73,12 +73,11 @@ const createEnquiry = asyncHandler(async (req, res) => {
 
         // Send Email to Owner (Non-blocking)
         sendOwnerNotification(enquiryData)
-            .then(() => console.log('✅ [DEBUG] Owner email notification sent successfully'))
-            .catch(error => console.error('❌ [DEBUG] Failed to send owner email:', error.message));
+            .catch(err => console.error('Email failed:', err.message));
 
         // Send WhatsApp notification (Non-blocking)
         sendWhatsApp(enquiryData)
-            .catch(error => console.error('❌ [DEBUG] Failed to send WhatsApp notification:', error.message));
+            .catch(err => console.error('WhatsApp failed:', err.message));
 
         return res.status(201).json(createdEnquiry);
     } catch (error) {

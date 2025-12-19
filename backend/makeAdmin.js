@@ -9,7 +9,6 @@ connectDB();
 const makeAdmin = async () => {
     const email = process.argv[2];
     if (!email) {
-        console.log('Please provide an email address as an argument.');
         process.exit(1);
     }
 
@@ -18,9 +17,8 @@ const makeAdmin = async () => {
         if (user) {
             user.isAdmin = true;
             await user.save();
-            console.log(`User ${user.name} (${email}) is now an Admin.`);
         } else {
-            console.log(`User with email ${email} not found.`);
+
         }
         process.exit();
     } catch (error) {

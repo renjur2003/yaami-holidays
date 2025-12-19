@@ -1,40 +1,26 @@
-import axios from 'axios';
+import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
-    console.log('📧 [DEBUG] Starting sendEmail via Resend API...');
-    
-    const RESEND_API_KEY = process.env.RESEND_API_KEY;
-    
-    if (!RESEND_API_KEY) {
-        console.log('❌ [DEBUG] Skipping: RESEND_API_KEY not found in environment variables');
-        return;
-    }
+    // Create transporter (using Gmail service as per .env hints)
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
 
     try {
-        console.log(`📧 [DEBUG] Sending via Resend API to: ${options.email}...`);
-        
-        const response = await axios.post('https://api.resend.com/emails', {
-            from: 'Yaami Holidays <onboarding@resend.dev>',
+        const info = await transporter.sendMail({
+            from: `"Yaami Holidays" <${process.env.EMAIL_USER}>`,
             to: options.email,
             subject: options.subject,
             html: options.html || options.message.replace(/\n/g, '<br>'),
-        }, {
-            headers: {
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
         });
 
-        console.log('✅ [DEBUG] Email sent successfully via Resend!');
-        console.log('📧 [DEBUG] Resend ID:', response.data.id);
+        console.log('✅ Email sent: %s', info.messageId);
     } catch (error) {
-        console.error('❌ [DEBUG] Error in Resend API process:');
-        if (error.response) {
-            console.error('Data:', error.response.data);
-            console.error('Status:', error.response.status);
-        } else {
-            console.error('Message:', error.message);
-        }
+        console.error('❌ Email send error:', error);
         throw error;
     }
 };
@@ -45,7 +31,6 @@ export const sendOwnerNotification = async (enquiryData) => {
     
     const ownerEmail = process.env.OWNER_EMAIL;
     if (!ownerEmail) {
-        console.log('Owner email not configured');
         return;
     }
 
