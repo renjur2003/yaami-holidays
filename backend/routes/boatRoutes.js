@@ -1,3 +1,11 @@
+import express from 'express';
+const router = express.Router();
+import {
+    getBoats,
+    getBoatById,
+    createBoat,
+    deleteBoat,
+} from '../controllers/boatController.js';
 import { simpleAdminProtect } from '../middleware/simpleAuth.js';
 
 router.route('/')
