@@ -1,14 +1,11 @@
+import 'dotenv/config';
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 
 import boatRoutes from './routes/boatRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
-
-// Load env vars
-dotenv.config();
 
 // Connect to database
 connectDB();

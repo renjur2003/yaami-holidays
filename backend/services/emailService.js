@@ -1,26 +1,30 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 const sendEmail = async (options) => {
-    // Create transporter (using Gmail service as per .env hints)
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
     try {
-        const info = await transporter.sendMail({
-            from: `"Yaami Holidays" <${process.env.EMAIL_USER}>`,
-            to: options.email,
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (!resendApiKey) {
+            throw new Error("RESEND_API_KEY is missing in environment variables");
+        }
+        
+        const resend = new Resend(resendApiKey);
+
+        const { data, error } = await resend.emails.send({
+            from: 'Yaami Holidays <onboarding@resend.dev>', // Update to your verified domain in production
+            to: [options.email],
             subject: options.subject,
             html: options.html || options.message.replace(/\n/g, '<br>'),
         });
 
-        console.log('✅ Email sent: %s', info.messageId);
+        if (error) {
+            console.error('❌ Resend Email Error:', error);
+            throw new Error(error.message);
+        }
+
+        console.log('✅ Email sent successfully:', data.id);
+        return data;
     } catch (error) {
-        console.error('❌ Email send error:', error);
+        console.error('❌ Email send exception:', error);
         throw error;
     }
 };
@@ -29,10 +33,15 @@ const sendEmail = async (options) => {
 export const sendOwnerNotification = async (enquiryData) => {
     const { name, email, phone, date, guests, message, boatName } = enquiryData;
     
-    const ownerEmail = process.env.OWNER_EMAIL;
-    if (!ownerEmail) {
-        return;
-    }
+    const ownerEmail = process.env.OWNER_EMAIL || 'keralaboatbooking7@gmail.com'; // Fallback if env missing during testing
+    
+    // Formatting the date for display
+    const formattedDate = new Date(date).toLocaleDateString('en-IN', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
 
     const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -65,7 +74,7 @@ export const sendOwnerNotification = async (enquiryData) => {
                     </tr>
                     <tr>
                         <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Date:</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #eee;">${new Date(date).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">${formattedDate}</td>
                     </tr>
                     <tr>
                         <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Guests:</td>
@@ -94,13 +103,15 @@ export const sendOwnerNotification = async (enquiryData) => {
         </div>
     `;
 
+    // Only send the owner notification
     await sendEmail({
         email: ownerEmail,
         subject: `🚤 New Enquiry: ${boatName} - ${name}`,
-        message: `New enquiry received for ${boatName}\n\nCustomer: ${name}\nPhone: ${phone}\nEmail: ${email}\nDate: ${date}\nGuests: ${guests}\nMessage: ${message || 'N/A'}`,
+        message: `New enquiry received for ${boatName}`, // Fallback text
         html: htmlContent
     });
 };
 
 export default sendEmail;
+
 
