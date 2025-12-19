@@ -11,5 +11,9 @@
     "start": "npm start --prefix backend",
     "build": "npm run build --prefix frontend",
     "lint": "npm run lint --prefix frontend && npm run lint --prefix backend"
+  },
+  "overrides": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   }
 }
