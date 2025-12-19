@@ -11,5 +11,8 @@
     "start": "npm start --prefix backend",
     "build": "npm run build --prefix frontend",
     "lint": "npm run lint --prefix frontend && npm run lint --prefix backend"
+  },
+  "dependencies": {
+    "lightningcss-linux-x64-gnu": "1.30.2"
   }
 }
