@@ -10,7 +10,7 @@ const sendEmail = async (options) => {
         const resend = new Resend(resendApiKey);
 
         const { data, error } = await resend.emails.send({
-            from: 'Yaami Holidays <onboarding@resend.dev>', // Update to your verified domain in production
+            from: 'Yaami Holidays <info@yaamiholidays.com>',
             to: [options.email],
             subject: options.subject,
             html: options.html || options.message.replace(/\n/g, '<br>'),
