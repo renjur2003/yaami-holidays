@@ -33,7 +33,7 @@ const sendEmail = async (options) => {
 export const sendOwnerNotification = async (enquiryData) => {
     const { name, email, phone, date, guests, message, boatName } = enquiryData;
     
-    const ownerEmail = process.env.OWNER_EMAIL || 'keralaboatbooking7@gmail.com'; // Fallback if env missing during testing
+    const ownerEmail = process.env.OWNER_EMAIL || 'yaamiholidays@gmail.com'; // Fallback if env missing during testing
     
     // Formatting the date for display
     const formattedDate = new Date(date).toLocaleDateString('en-IN', { 
