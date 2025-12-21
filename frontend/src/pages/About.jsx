@@ -1,9 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import SEO from '../components/SEO';
 
 const About = () => {
   return (
     <div className="bg-black text-white min-h-screen pt-20">
+      <SEO 
+        title="About Us - Luxury Houseboat Experiences" 
+        description="Learn about Yaami Holidays, the premier provider of luxury houseboat and shikara experiences in Alleppey backwaters." 
+      />
       {/* Hero Section */}
       <div className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

@@ -31,7 +31,12 @@ const BoatDetails = () => {
 
   return (
     <div className="pt-24 pb-16 min-h-screen bg-yaami-black">
-      <SEO title={boat.title} description={`${boat.title} - ${boat.description}`} />
+      <SEO 
+        title={`${boat.title} - Alleppey Booking`} 
+        description={`Book ${boat.title} in Alleppey. Capacity: ${boat.capacity}, Price: ${boat.price}. ${boat.description?.slice(0, 150)}...`}
+        image={boat.image}
+        keywords={`${boat.title}, ${boat.category} Rental Alleppey, Boat Booking Kerala`}
+      />
       
       {/* Enquiry Modal */}
       <EnquiryModal boat={boat} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

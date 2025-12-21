@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import SEO from '../components/SEO';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -24,6 +25,11 @@ const Contact = () => {
 
   return (
     <div className="bg-black text-white min-h-screen pt-20">
+      <SEO 
+        title="Contact Us" 
+        description="Get in touch with Yaami Holidays for booking enquiries. Call +91 85479 64084 or visit our office in Alleppey."
+        keywords="Contact Yaami Holidays, Houseboat Booking Number, Alleppey Tourism Contact, Boat Rental Phone"
+      />
        {/* Hero Section */}
        <div className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
