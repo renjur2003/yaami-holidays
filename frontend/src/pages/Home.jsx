@@ -16,6 +16,11 @@ const Home = () => {
           "@type": "LocalBusiness",
           "name": "Yaami Holidays",
           "image": "https://yaamiholidays.com/logo-round.png",
+          "logo": "https://yaamiholidays.com/logo-round.png",
+          "sameAs": [
+            "https://www.instagram.com/yaamiholidays",
+            "https://www.facebook.com/share/16scXgwW6B/?mibextid=wwXIfr"
+          ],
           "description": "Premium Houseboat and Boat Rental Service in Alleppey",
           "address": {
             "@type": "PostalAddress",
